@@ -21,6 +21,14 @@ func UserAuthorized(w http.ResponseWriter, r *http.Request, permissionLevel mode
     // Fall back to jwtToken header if Authorization is not present
     if tokenStr == "" {
         tokenStr = r.Header.Get("jwtToken")
+
+		if tokenStr == "" {
+			tokenStr = r.Header.Get("jwttoken")
+		}
+
+		if tokenStr == "" {
+			tokenStr = r.Header.Get("Jwttoken")
+		}
     }
     
     println("Token jwt: ", tokenStr)
@@ -28,7 +36,7 @@ func UserAuthorized(w http.ResponseWriter, r *http.Request, permissionLevel mode
         http.Error(w, "Unauthorized", http.StatusUnauthorized)
         return false
     }
-	
+
 	client := database.NewMongoDB(config.MongoURI)
 
 	claims := &jwt.RegisteredClaims{}
