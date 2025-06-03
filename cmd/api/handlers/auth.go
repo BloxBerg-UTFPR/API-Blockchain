@@ -15,15 +15,20 @@ import (
 
 func UserAuthorized(w http.ResponseWriter, r *http.Request, permissionLevel models.UserStatus) bool {
 
-	//Check for the Authorization header
-	//tokenStr := r.Header.Get("jwtToken")
-	tokenStr := r.Header.Get("Authorization")
-	println("Token jwt: ", tokenStr)
-	if tokenStr == "" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return false
-	}
-
+	//Check for the Authorization header or jwtToken header
+    tokenStr := r.Header.Get("Authorization")
+    
+    // Fall back to jwtToken header if Authorization is not present
+    if tokenStr == "" {
+        tokenStr = r.Header.Get("jwtToken")
+    }
+    
+    println("Token jwt: ", tokenStr)
+    if tokenStr == "" {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return false
+    }
+	
 	client := database.NewMongoDB(config.MongoURI)
 
 	claims := &jwt.RegisteredClaims{}
